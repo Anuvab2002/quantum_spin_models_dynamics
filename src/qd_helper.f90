@@ -7,7 +7,6 @@ contains
 !> @param[in]     v_1         vector 1
 !> @param[in]     v_2         vector 2
 !> @return        val         the inner product value
-!> @todo unit testing
   function inner_product_dis(v_1, v_2)result(val)
     implicit none
     ! io variables
@@ -39,7 +38,6 @@ contains
 !> @param[in]     state_v       state vector
 !> @param[in]     op_mat        operator matrix
 !> @return        val           expectation value
-!> @todo unit testing
   function expectation_value_dis(state_v, op_mat)result(val)
     implicit none
     ! io variable

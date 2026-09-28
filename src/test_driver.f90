@@ -541,4 +541,69 @@ contains
       test_stat = .true.
     end if
   end subroutine test_spin_spin_interaction
+!> @brief subroutine for testing zeeman interaction function in ising_model.f90
+  subroutine test_zeeman_term(test_stat)
+    use global_m
+    use ising_model_m
+    use linear_algebra_helper_m
+    use matrix_generator_m
+    implicit none
+    ! io variables
+    logical, intent(out)                    :: test_stat
+    ! internal variables
+    complex(8), dimension(2,2)              :: sx
+    complex(8), dimension(2,2)              :: sy
+    complex(8), dimension(2,2)              :: sz
+    complex(8), dimension(2**2,2**2)        :: spinz_zeeman_2spin
+    complex(8), dimension(2**2,2**2)        :: spinx_zeeman_2spin
+    complex(8), dimension(2**2,2**2)        :: spiny_zeeman_2spin
+    complex(8), dimension(2**2,2**2)        :: spinz_zeeman_2spin_exp
+    complex(8), dimension(2**2,2**2)        :: spiny_zeeman_2spin_exp
+    complex(8), dimension(2**2,2**2)        :: spinx_zeeman_2spin_exp
+    complex(8), dimension(2**2,2**2)        :: diff1
+    complex(8), dimension(2**2,2**2)        :: diff2
+    complex(8), dimension(2**2,2**2)        :: diff3
+    logical                                 :: stat1
+    logical                                 :: stat2
+    logical                                 :: stat3
+    complex(8), parameter                   :: h = cmplx(1.d0, 0.d0)
+    !
+    sx = pauli_matrices(1)
+    sy = pauli_matrices(2)
+    sz = pauli_matrices(3)
+    !
+    spinz_zeeman_2spin = zeeman_term(sz, 2, h)
+    spiny_zeeman_2spin = zeeman_term(sy, 2, h)
+    spinx_zeeman_2spin = zeeman_term(sx, 2, h)
+    !
+    spinz_zeeman_2spin_exp = reshape((/ cmplx(2.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                        cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                        cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0),&
+                                        cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-2.d0,0.d0) &
+                                      /), shape(spinz_zeeman_2spin_exp), order=(/2,1/))
+    spinx_zeeman_2spin_exp = reshape((/ cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), &
+                                        cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), &
+                                        cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0),&
+                                        cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0) &
+                                      /), shape(spinz_zeeman_2spin_exp), order=(/2,1/))
+    spiny_zeeman_2spin_exp = reshape((/ cmplx(0.d0,0.d0), cmplx(0.d0,-1.d0), cmplx(0.d0,-1.d0), cmplx(0.d0,0.d0), &
+                                        cmplx(0.d0,1.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,-1.d0), &
+                                        cmplx(0.d0,1.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,-1.d0),&
+                                        cmplx(0.d0,0.d0), cmplx(0.d0,1.d0), cmplx(0.d0,1.d0), cmplx(0.d0,0.d0) &
+                                      /), shape(spinz_zeeman_2spin_exp), order=(/2,1/))
+    !
+    diff1 = spinz_zeeman_2spin_exp - spinz_zeeman_2spin
+    diff2 = spinx_zeeman_2spin_exp - spinx_zeeman_2spin
+    diff3 = spiny_zeeman_2spin_exp - spiny_zeeman_2spin
+    !
+    call if_null_c(diff1, stat1)
+    call if_null_c(diff2, stat2)
+    call if_null_c(diff3, stat3)
+    !
+    test_stat = .false.
+    if (stat1 .and. stat2 .and. stat3) then
+      test_stat = .true.
+    end if
+    write(*,*)  spiny_zeeman_2spin(4,3)
+  end subroutine test_zeeman_term
 end module test_driver_m

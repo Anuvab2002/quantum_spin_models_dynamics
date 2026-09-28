@@ -604,6 +604,92 @@ contains
     if (stat1 .and. stat2 .and. stat3) then
       test_stat = .true.
     end if
-    write(*,*)  spiny_zeeman_2spin(4,3)
   end subroutine test_zeeman_term
+!> @brief subroutine for tesing magnetization operator function in ising_model.f90
+  subroutine test_magnetization_operator(test_stat)
+    use global_m
+    use linear_algebra_helper_m
+    use matrix_generator_m
+    use ising_model_m
+    use qd_helper_m
+    implicit none
+    ! io variables
+    logical, intent(out)                     :: test_stat
+    ! internal variables
+    integer, parameter                       :: n=5
+    complex(8), dimension(2,2)               :: sz
+    complex(8), allocatable, dimension(:,:)  :: mag_op
+    complex(8), dimension(2**n)              :: state
+    complex(8)                               :: mag_val
+    !
+    sz = pauli_matrices(3)
+    mag_op = magnetization_operator(sz, n)
+    state = cmplx(0.d0, 0.d0)
+    state(1) = cmplx(1.d0, 0.d0)
+    mag_val = expectation_value_dis(state, mag_op)
+    !
+    test_stat = .false.
+    if (abs(abs(mag_val)-n*1.d0) .le. tol) then
+      test_stat = .true.
+    end if
+  end subroutine test_magnetization_operator
+!> @brief subroutine for testing bch_c subroutine in math_helper.f90
+  subroutine test_bch_c(test_stat)
+    use global_m
+    use math_helper_m
+    use matrix_generator_m
+    use linear_algebra_helper_m
+    implicit none
+    ! io variables
+    logical, intent(out)              :: test_stat
+    ! internal variables
+    complex(8), dimension(2,2)                     :: sx
+    complex(8), dimension(2,2)                     :: sy
+    complex(8), dimension(2,2)                     :: sz
+    complex(8), allocatable, dimension(:,:)        :: mat0
+    complex(8), allocatable, dimension(:,:)        :: mat1
+    complex(8), allocatable, dimension(:,:)        :: mat2
+    complex(8), allocatable, dimension(:,:)        :: mat3
+    complex(8), dimension(2,2)                     :: exp0
+    complex(8), dimension(2,2)                     :: exp1
+    complex(8), dimension(2,2)                     :: exp2
+    complex(8), dimension(2,2)                     :: exp3
+    complex(8), dimension(2,2)                     :: dif0
+    complex(8), dimension(2,2)                     :: dif1
+    complex(8), dimension(2,2)                     :: dif2
+    complex(8), dimension(2,2)                     :: dif3
+    logical                                        :: stat0
+    logical                                        :: stat1
+    logical                                        :: stat2
+    logical                                        :: stat3
+    !
+    sx = pauli_matrices(1)
+    sy = pauli_matrices(2)
+    sz = pauli_matrices(3)
+    !
+    call bch_c(sx, sz, 0, mat0)
+    exp0 = sz
+    dif0 = exp0 - mat0
+    call if_null_c(dif0, stat0)
+    !
+    call bch_c(sx, sz, 1, mat1)
+    exp1 = exp0 + (-2.d0*iota*hbar)*sy
+    dif1 = exp1 - mat1
+    call if_null_c(dif1, stat1)
+    !
+    call bch_c(sx, sz, 2, mat2)
+    exp2 = exp1 - 0.5d0*((2.d0*iota*hbar)**2.d0)*sz
+    dif2 = exp2 - mat2
+    call if_null_c(dif2, stat2)
+    !
+    test_stat = .false.
+    if (stat2) then
+      test_stat = .true.
+    end if
+    !
+    write(*,*) exp2(1,1)
+    write(*,*) exp2(1,2)
+    write(*,*) exp2(2,1)
+    write(*,*) exp2(2,2)
+  end subroutine test_bch_c
 end module test_driver_m

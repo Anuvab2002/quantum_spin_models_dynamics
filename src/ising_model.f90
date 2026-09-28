@@ -36,7 +36,7 @@ contains
     !
     dim = size(s,1)
     if (size(s,2).ne.dim) then
-      stop "Execution error! Zeeman term calculation failed! Provid a square spin matrix."
+      stop "Execution error! Spin-spin interaction calculation failed! Provid a square spin matrix."
     end if
     dim = size(s,1)
     dimm = dim**n
@@ -134,4 +134,53 @@ contains
       field_int = field_int + h*temp2
     end do
   end function zeeman_term
+!> @brief function for calculating magnetization operator
+!> @param[in]       s         spin matrix
+!> @param[in]       n         number of spin chains
+!> @return           mag       magnetization operator
+!> @todo unit testing to be done
+  function magnetization_operator(s, n)result(mag)
+    use matrix_generator_m
+    implicit none
+    ! io variables
+    complex(8), dimension(:,:), intent(in)      :: s
+    integer, intent(in)                         :: n
+    complex(8), allocatable, dimension(:,:)     :: mag
+    ! interal variables
+    integer                                     :: dim
+    integer                                     :: idx
+    integer                                     :: p
+    integer                                     :: q
+    complex(8), allocatable, dimension(:,:)     :: i1
+    complex(8), allocatable, dimension(:,:)     :: i2
+    complex(8), allocatable, dimension(:,:)     :: temp1
+    complex(8), allocatable, dimension(:,:)     :: temp2
+    !
+    dim = size(s,1)
+    if (size(s,2).ne.dim) then
+      stop "Execution error! Magnetization operator calculation failed. Provid a square spin matrix."
+    end if
+    !
+    allocate(mag(dim**n,dim**n))
+    mag = cmplx(0.d0, 0.d0)
+    !
+    allocate(temp2(dim**n,dim**n))
+    do idx = 1,n
+      temp2 = cmplx(0.d0, 0.d0)
+      !
+      p = idx-1
+      q = n-idx
+      !
+      i1 = identity_matrix_complex(dim**p)
+      i2 = identity_matrix_complex(dim**q)
+      !
+      allocate(temp1(dim**(idx),dim**(idx)))
+      call kron_product(i1, s, temp1)
+      call kron_product(temp1, i2, temp2)
+      !
+      deallocate(i1, i2, temp1)
+      mag = mag + temp2
+    end do
+    deallocate(temp2)
+  end function magnetization_operator
 end module ising_model_m

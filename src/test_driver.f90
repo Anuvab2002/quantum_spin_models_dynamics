@@ -411,4 +411,134 @@ contains
       test_stat = .true.
     end if
   end subroutine test_factorial
+!> @brief subroutine for testing spin-spin interaction function in ising_model.f90
+  subroutine test_spin_spin_interaction(test_stat)
+    use global_m
+    use ising_model_m
+    use matrix_generator_m
+    use linear_algebra_helper_m
+    implicit none
+    ! io variables
+    logical, intent(out)                    :: test_stat
+    ! internal variables
+    complex(8), dimension(2,2)              :: sz
+    complex(8), dimension(2,2)              :: sy
+    complex(8), dimension(2,2)              :: sx
+    complex(8), dimension(2**2,2**2)        :: spinz_int_2spin
+    complex(8), dimension(2**2,2**2)        :: spinx_int_2spin
+    complex(8), dimension(2**2,2**2)        :: spiny_int_2spin
+    complex(8), dimension(2**2,2**2)        :: spinz_int_2spin_exp
+    complex(8), dimension(2**2,2**2)        :: spinx_int_2spin_exp
+    complex(8), dimension(2**2,2**2)        :: spiny_int_2spin_exp
+    complex(8), dimension(2**3,2**3)        :: spinz_int_3spinobc
+    complex(8), dimension(2**3,2**3)        :: spinz_int_3spinpbc
+    complex(8), dimension(2**3,2**3)        :: spinz_int_3spinobc_exp
+    complex(8), dimension(2**3,2**3)        :: spinz_int_3spinpbc_exp
+    complex(8), dimension(2**2,2**2)        :: diff1
+    complex(8), dimension(2**2,2**2)        :: diff4
+    complex(8), dimension(2**2,2**2)        :: diff5
+    complex(8), dimension(2**3,2**3)        :: diff2
+    complex(8), dimension(2**3,2**3)        :: diff3
+    logical                                 :: stat1
+    logical                                 :: stat2
+    logical                                 :: stat3
+    logical                                 :: stat4
+    logical                                 :: stat5
+    !
+    sz = pauli_matrices(3)
+    !
+    spinz_int_2spin = spin_spin_interaction(sz, 2, "o", 1.d0)
+    spinz_int_2spin_exp = reshape((/cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                  cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                  cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), &
+                                  cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0)/), &
+                        shape(spinz_int_2spin_exp), order=(/2,1/))
+    !
+    diff1 = spinz_int_2spin_exp-spinz_int_2spin
+    call if_null_c(diff1, stat1)
+    !
+    spinz_int_3spinobc = spin_spin_interaction(sz, 3, "o", 1.d0)
+    spinz_int_3spinobc_exp = reshape((/ cmplx(2.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-2.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(-2.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(2.d0,0.d0) &
+                                     /), shape(spinz_int_3spinobc_exp), order=(/2,1/))
+       !
+       spinz_int_3spinpbc = spin_spin_interaction(sz, 3, "p", 1.d0)
+       spinz_int_3spinpbc_exp = reshape((/ cmplx(3.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       !
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                       cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(3.d0,0.d0) &
+                                     /), shape(spinz_int_3spinpbc_exp), order=(/2,1/))
+    !
+    diff2 = spinz_int_3spinobc_exp - spinz_int_3spinobc
+    diff3 = spinz_int_3spinpbc_exp - spinz_int_3spinpbc
+    call if_null_c(diff2, stat2)
+    call if_null_c(diff3, stat3)
+    !
+    sx = pauli_matrices(1)
+    sy = pauli_matrices(2)
+    spinx_int_2spin = spin_spin_interaction(sx, 2, "o", 1.d0)
+    spiny_int_2spin = spin_spin_interaction(sy, 2, "o", 1.d0)
+    !
+    spinx_int_2spin_exp = reshape((/ cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), &
+                                     cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), &
+                                     cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                     cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0) &
+                                  /), shape(spinx_int_2spin_exp), order=(/2,1/))
+    spiny_int_2spin_exp = reshape((/ cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), &
+                                     cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), &
+                                     cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                                     cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0) &
+                                  /), shape(spiny_int_2spin_exp), order=(/2,1/))
+
+    !
+    diff4 = spinx_int_2spin_exp-spinx_int_2spin
+    call if_null_c(diff4, stat4)
+    diff5 = spiny_int_2spin_exp-spiny_int_2spin
+    call if_null_c(diff5, stat5)
+    !
+    test_stat = .false.
+    if (stat1 .and. stat2 .and. stat3 .and. stat4 .and. stat5) then
+      test_stat = .true.
+    end if
+  end subroutine test_spin_spin_interaction
 end module test_driver_m

@@ -633,6 +633,61 @@ contains
       test_stat = .true.
     end if
   end subroutine test_magnetization_operator
+!> @brief subroutine for testing transverse_ising1d_hamiltonian function in ising_model.f90
+  subroutine test_transverse_ising1d_hamiltonian(test_stat)
+    use global_m
+    use linear_algebra_helper_m
+    use matrix_generator_m
+    use ising_model_m
+    implicit none
+    ! io variables
+    logical, intent(out)                  :: test_stat
+    ! internal variables
+    complex(8), dimension(2,2)            :: sz
+    complex(8), dimension(2,2)            :: sx
+    integer, parameter                    :: n=2
+    double precision                      :: j
+    complex(8)                            :: h
+    complex(8), dimension(2**n,2**n)      :: hamiltonian
+    complex(8), dimension(2**n,2**n)      :: spin_intobc
+    complex(8), dimension(2**n,2**n)      :: spin_intpbc
+    complex(8), dimension(2**n,2**n)      :: field_int
+    complex(8), dimension(2**n,2**n)      :: dif1
+    complex(8), dimension(2**n,2**n)      :: dif2
+    complex(8), dimension(2**n,2**n)      :: dif3
+    logical                               :: stat1
+    logical                               :: stat2
+    logical                               :: stat3
+    !
+    sz = (hbar/2.d0)*pauli_matrices(3)
+    sx = (hbar/2.d0)*pauli_matrices(1)
+    !
+    j = exp(1.d0)
+    h = cmplx(0.d0,0.d0)
+    hamiltonian = transverse_ising1d_hamiltonian(n, sz, sx, j, h, "o")
+    spin_intobc = spin_spin_interaction(sz, n, "o", j)
+    dif1 = hamiltonian - spin_intobc
+    call if_null_c(dif1, stat1)
+    !
+    j = pi
+    h = cmplx(0.d0,0.d0)
+    hamiltonian = transverse_ising1d_hamiltonian(n, sz, sx, j, h, "p")
+    spin_intpbc = spin_spin_interaction(sz, n, "p", j)
+    dif2 = hamiltonian - spin_intpbc
+    call if_null_c(dif2, stat2)
+    !
+    j = 0.d0
+    h = cmplx(pi,exp(1.d0))
+    hamiltonian = transverse_ising1d_hamiltonian(n, sz, sx, j, h, "p")
+    field_int = zeeman_term(sx, n, h)
+    dif3 = hamiltonian - field_int
+    call if_null_c(dif3, stat3)
+    !
+    test_stat = .false.
+    if (stat1 .and. stat2 .and. stat3) then
+      test_stat = .true.
+    end if
+  end subroutine test_transverse_ising1d_hamiltonian
 !> @brief subroutine for testing bch_c subroutine in math_helper.f90
   subroutine test_bch_c(test_stat)
     use global_m
@@ -683,13 +738,9 @@ contains
     call if_null_c(dif2, stat2)
     !
     test_stat = .false.
-    if (stat2) then
+    if (stat0 .and. stat1 .and. stat2) then
       test_stat = .true.
     end if
     !
-    write(*,*) exp2(1,1)
-    write(*,*) exp2(1,2)
-    write(*,*) exp2(2,1)
-    write(*,*) exp2(2,2)
   end subroutine test_bch_c
 end module test_driver_m

@@ -154,6 +154,16 @@ contains
     end if
     call test_banner_footer(testname)
     !---------------------------------------------
+    testname = "transverse_ising1d_hamiltonian"
+    call test_banner_header(testname)
+    call test_transverse_ising1d_hamiltonian(test_stat)
+    if (test_stat) then
+      write(*,*) "transverse_ising1d_hamiltonian passed."
+    else
+      write(*,*) "transverse_ising1d_hamiltonian failed."
+    end if
+    call test_banner_footer(testname)
+    !---------------------------------------------
     write(*,*) "==============================================================================="
   end subroutine testing_list
 end module test_controller_m

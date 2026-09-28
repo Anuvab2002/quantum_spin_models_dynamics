@@ -133,6 +133,7 @@ contains
       deallocate(i1, i2, temp1)
       field_int = field_int + h*temp2
     end do
+    deallocate(temp2)
   end function zeeman_term
 !> @brief function for calculating magnetization operator
 !> @param[in]       s         spin matrix

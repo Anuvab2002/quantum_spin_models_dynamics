@@ -185,4 +185,38 @@ contains
     end do
     deallocate(temp2)
   end function magnetization_operator
+!> @brief function for constructing the Hamiltonian of 1-d transverse field ising model
+!> @param[in]       n         number of spin sites in the chain
+!> @param[in]       s1        spin matrix along the spin chain
+!> @param[in]       s2        spin matrix parpendicular to the spin chain
+!> @param[in]       j         inter-spin coupling strength
+!> @param[in]       h         spin-field coupling strength
+!> @param[in]       boundary  boundary condition
+!> @return          ham       hamiltonian matrix
+  function transverse_ising1d_hamiltonian(n, s1, s2, j, h, boundary)result(ham)
+    implicit none
+    ! io variables
+    integer, intent(in)                           :: n
+    complex(8), dimension(:,:), intent(in)        :: s1
+    complex(8), dimension(:,:), intent(in)        :: s2
+    double precision, intent(in)                  :: j
+    complex(8), intent(in)                        :: h
+    character(len=1), intent(in)                  :: boundary
+    complex(8), allocatable, dimension(:,:)       :: ham
+    ! internal variables
+    integer                                       :: dim
+    integer                                       :: dimm
+    complex(8), allocatable, dimension(:,:)       :: nn_coupling
+    complex(8), allocatable, dimension(:,:)       :: zeeman_coupling
+    !
+    dim = size(s1,1)
+    dimm = dim**n
+    allocate(ham(dimm,dimm))
+    !
+    nn_coupling = spin_spin_interaction(s1, n, boundary, j)
+    zeeman_coupling = zeeman_term(s2, n, h)
+    !
+    ham = nn_coupling + zeeman_coupling
+    deallocate(nn_coupling, zeeman_coupling)
+  end function transverse_ising1d_hamiltonian
 end module ising_model_m

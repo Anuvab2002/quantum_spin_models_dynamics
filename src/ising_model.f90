@@ -9,7 +9,6 @@ contains
 !> @param[in]      bc           boundary condition
 !> @param[in]      j            coupling strength
 !> @return         spin_int     spin-spin interaction term
-!> @todo unit test to be done
   function spin_spin_interaction(s, n, boundary, j)result(spin_int)
     use linear_algebra_helper_m
     use matrix_generator_m
@@ -36,6 +35,7 @@ contains
     !
     dim = size(s,1)
     if (size(s,2).ne.dim) then
+      spin_int = cmplx(0.d0,0.d0)
       stop "Execution error! Spin-spin interaction calculation failed! Provid a square spin matrix."
     end if
     dim = size(s,1)
@@ -89,7 +89,6 @@ contains
 !> @param[in]       n           number of spin sites in the chain
 !> @param[in]       h           strenght of the spin-field coupling
 !> return           field_int   the zeeman term
-!> @todo unit testing tobe done
   function zeeman_term(s, n, h)result(field_int)
     use linear_algebra_helper_m
     use matrix_generator_m
@@ -111,6 +110,7 @@ contains
     !
     dim = size(s,1)
     if (size(s,2).ne.dim) then
+      field_int = cmplx(0.d0,0.d0)
       stop "Execution error! Zeeman term calculation failed! Provid a square spin matrix."
     end if
     allocate(field_int(dim**n,dim**n))
@@ -139,7 +139,6 @@ contains
 !> @param[in]       s         spin matrix
 !> @param[in]       n         number of spin chains
 !> @return           mag       magnetization operator
-!> @todo unit testing to be done
   function magnetization_operator(s, n)result(mag)
     use linear_algebra_helper_m
     use matrix_generator_m
@@ -160,14 +159,15 @@ contains
     !
     dim = size(s,1)
     if (size(s,2).ne.dim) then
+      mag = cmplx(0.d0,0.d0)
       stop "Execution error! Magnetization operator calculation failed. Provid a square spin matrix."
     end if
     !
     allocate(mag(dim**n,dim**n))
-    mag = cmplx(0.d0, 0.d0)
+    mag = cmplx(1.d0, 0.d0)
     !
     allocate(temp2(dim**n,dim**n))
-    do idx = 1,n
+    do idx = 1,n-1
       temp2 = cmplx(0.d0, 0.d0)
       !
       p = idx-1

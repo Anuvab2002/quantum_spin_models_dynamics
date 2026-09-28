@@ -31,18 +31,30 @@ contains
     integer                                   :: q
     complex(8), allocatable, dimension(:,:)   :: temp1
     complex(8), allocatable, dimension(:,:)   :: temp2
+    complex(8), allocatable, dimension(:,:)   :: spin_int_obc
+    complex(8), allocatable, dimension(:,:)   :: spin_int_pbc
     !
+    dim = size(s,1)
+    if (size(s,2).ne.dim) then
+      stop "Execution error! Zeeman term calculation failed! Provid a square spin matrix."
+    end if
     dim = size(s,1)
     dimm = dim**n
     !
     allocate(spin_int(dimm, dimm))
     spin_int = cmplx(0.d0, 0.d0)
+    allocate(spin_int_obc(dim**n,dim**n))
+    allocate(spin_int_pbc(dim**n,dim**n))
+    spin_int_obc = cmplx(0.d0, 0.d0)
+    spin_int_pbc = cmplx(0.d0, 0.d0)
     !
     allocate(op_s(dim**2,dim**2))
     call kron_product(s, s, op_s)
     !
     allocate(temp2(dimm,dimm))
     do idx = 1,n-1
+      temp2 = cmplx(0.d0, 0.d0)
+      !
       p = idx-1
       q = n-idx-1
       i1 = identity_matrix_complex(dim**p)
@@ -52,9 +64,25 @@ contains
       call kron_product(temp1, i2, temp2)
       deallocate(i1,i2)
       deallocate(temp1)
-      spin_int = spin_int + j*temp2
+      spin_int_obc = spin_int_pbc + j*temp2
     end do
+    !
+  select case(bc)
+  case("o")
+    spin_int = spin_int_pbc
     deallocate(temp2)
+  case("p")
+    temp2 = cmplx(0.0d0, 0.0d0)
+    allocate(temp1(dim**(n-1),dim**(n-1)))
+    i1 = identity_matrix_complex(dim**(n-2))
+    call kron_product(s, i1, temp1)
+    call kron_product(temp1, s, temp2)
+    spin_int_pbc = spin_int_obc + j*temp2
+    deallocate(i1, i2)
+    deallocate(temp1, temp2)
+    spin_int = spin_int_pbc
+  end select
+  deallocate(spin_int_obc, spin_int_pbc)
   end function spin_spin_interaction
 !> @brief function for calculating the zeeman term of the Hamiltonian
 !> @param[in]       s           the spin matrix
@@ -86,9 +114,12 @@ contains
       stop "Execution error! Zeeman term calculation failed! Provid a square spin matrix."
     end if
     allocate(field_int(dim**n,dim**n))
+    field_int = cmplx(0.d0, 0.d0)
     !
     allocate(temp2(dim**n,dim**n))
     do idx = 1,n
+      temp2 = cmplx(0.d0, 0.d0)
+      !
       p = idx-1
       q = n-idx
       !

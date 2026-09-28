@@ -85,6 +85,7 @@ contains
     integer                                                  :: r
     integer                                                  :: c
     complex(8), allocatable, dimension(:,:)                  :: temp
+    complex(8), allocatable, dimension(:,:)                  :: temp1
     !
     r = size(m1,1)
     c = size(m1,2)
@@ -95,12 +96,15 @@ contains
     end if
     !
     allocate(temp(r,c))
+    allocate(temp1(r,c))
     allocate(bch_m(r,c))
     temp = m2
     bch_m = m2
     do idx = 1,order
-      call calculate_commutator_c(m1, temp, temp)
-      bch_m = bch_m + (1.d0/factorial(order))*temp
+      temp1 = cmplx(0.d0,0.d0)
+      call calculate_commutator_c(m1, temp, temp1)
+      temp = temp1
+      bch_m = bch_m + (1.d0/factorial(idx))*temp
     end do
     deallocate(temp)
   end subroutine bch_c

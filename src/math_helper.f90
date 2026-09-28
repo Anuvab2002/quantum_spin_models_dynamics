@@ -71,7 +71,6 @@ contains
 !> @param[in]     m2      another matrix
 !> @param[in]     order   order of the calculation
 !> @return        bch_m   calculated matrix
-!> @todo unit testing to be done.
   subroutine bch_c(m1, m2, order, bch_m)
     use linear_algebra_helper_m
     implicit none

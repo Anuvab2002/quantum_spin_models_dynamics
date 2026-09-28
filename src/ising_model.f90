@@ -56,4 +56,51 @@ contains
     end do
     deallocate(temp2)
   end function spin_spin_interaction
+!> @brief function for calculating the zeeman term of the Hamiltonian
+!> @param[in]       s           the spin matrix
+!> @param[in]       n           number of spin sites in the chain
+!> @param[in]       h           strenght of the spin-field coupling
+!> return           field_int   the zeeman term
+!> @todo unit testing tobe done
+  function zeeman_term(s, n, h)result(field_int)
+    use linear_algebra_helper_m
+    use matrix_generator_m
+    implicit none
+    ! io variables
+    complex(8), dimension(:,:), intent(in)      :: s
+    integer, intent(in)                         :: n
+    complex(8), intent(in)                      :: h
+    complex, allocatable, dimension(:,:)        :: field_int
+    ! internal variables
+    integer                                     :: dim
+    integer                                     :: idx
+    integer                                     :: p
+    integer                                     :: q
+    complex(8), allocatable, dimension(:,:)     :: i1
+    complex(8), allocatable, dimension(:,:)     :: i2
+    complex(8), allocatable, dimension(:,:)     :: temp1
+    complex(8), allocatable, dimension(:,:)     :: temp2
+    !
+    dim = size(s,1)
+    if (size(s,2).ne.dim) then
+      stop "Execution error! Zeeman term calculation failed! Provid a square spin matrix."
+    end if
+    allocate(field_int(dim**n,dim**n))
+    !
+    allocate(temp2(dim**n,dim**n))
+    do idx = 1,n
+      p = idx-1
+      q = n-idx
+      !
+      i1 = identity_matrix_complex(dim**p)
+      i2 = identity_matrix_complex(dim**q)
+      !
+      allocate(temp1(dim**(idx),dim**(idx)))
+      call kron_product(i1, s, temp1)
+      call kron_product(temp1, i2, temp2)
+      !
+      deallocate(i1, i2, temp1)
+      field_int = field_int + h*temp2
+    end do
+  end function zeeman_term
 end module ising_model_m

@@ -17,7 +17,7 @@ contains
     ! io variables
     complex(8), dimension(:,:), intent(in)    :: s
     integer, intent(in)                       :: n
-    character(len=*), intent(in)              :: boundary
+    character(len=1), intent(in)              :: boundary
     double precision, intent(in)              :: j
     complex(8), allocatable, dimension(:,:)   :: spin_int
     ! internal variable
@@ -64,12 +64,12 @@ contains
       call kron_product(temp1, i2, temp2)
       deallocate(i1,i2)
       deallocate(temp1)
-      spin_int_obc = spin_int_pbc + j*temp2
+      spin_int_obc = spin_int_obc + j*temp2
     end do
     !
-  select case(bc)
+  select case(boundary)
   case("o")
-    spin_int = spin_int_pbc
+    spin_int = spin_int_obc
     deallocate(temp2)
   case("p")
     temp2 = cmplx(0.0d0, 0.0d0)
@@ -78,7 +78,7 @@ contains
     call kron_product(s, i1, temp1)
     call kron_product(temp1, s, temp2)
     spin_int_pbc = spin_int_obc + j*temp2
-    deallocate(i1, i2)
+    deallocate(i1)
     deallocate(temp1, temp2)
     spin_int = spin_int_pbc
   end select
@@ -140,6 +140,7 @@ contains
 !> @return           mag       magnetization operator
 !> @todo unit testing to be done
   function magnetization_operator(s, n)result(mag)
+    use linear_algebra_helper_m
     use matrix_generator_m
     implicit none
     ! io variables

@@ -13,5 +13,5 @@
   11. qd_helper.f90                     -> provides different helper routines for quantum dynamics calculations
   12. ising_model.f90                   -> provides different routines for quantum isning model calculations
   13. dqc_probe.f90                     -> module for providing quantities for probing dynamical quantum chaos
-  
+  14. simulate_helper.f90               -> provides additional routines for simulation
 ===============================================================================

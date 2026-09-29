@@ -105,6 +105,6 @@ contains
       temp = temp1
       bch_m = bch_m + (1.d0/factorial(idx))*temp
     end do
-    deallocate(temp)
+    deallocate(temp, temp1)
   end subroutine bch_c
 end module math_helper_m

@@ -174,6 +174,16 @@ contains
     end if
     call test_banner_footer(testname)
     !---------------------------------------------
+    testname = "vi_truncation_index"
+    call test_banner_header(testname)
+    call test_vi_truncation_index(test_stat)
+    if (test_stat) then
+      write(*,*) "vi_truncation_index passed."
+    else
+      write(*,*) "vi_truncation_index failed."
+    end if
+    call test_banner_footer(testname)
+    !---------------------------------------------
     write(*,*) "==============================================================================="
   end subroutine testing_list
 end module test_controller_m

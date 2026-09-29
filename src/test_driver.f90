@@ -814,4 +814,31 @@ contains
     deallocate(ham, eig_vect, eig_val)
     deallocate(psi0, psit)
   end subroutine test_crank_nicolson_evolution
+!> @brief subroutine for testing vi_truncation_index in simulate_helper.f90
+  subroutine test_vi_truncation_index(test_stat)
+    use global_m
+    use simulate_helper_m
+    use matrix_generator_m
+    implicit none
+    ! io variables
+    logical, intent(out)                  :: test_stat
+    ! internal variables
+    integer, parameter                    :: n=10
+    complex(8), dimension(2,2)            :: sz
+    complex(8), dimension(2,2)            :: sx
+    double precision, parameter           :: j=0.3d0
+    complex(8), parameter                 :: h=cmplx(1.0d0,0.0d0)
+    integer                               :: val
+    !
+    sx = (hbar/2.d0)*pauli_matrices(1)
+    sz = (hbar/2.d0)*pauli_matrices(3)
+    val = vi_truncation_index(n, j, h, sz, sx)
+    !
+    test_stat = .false.
+    if (val .gt. 0) then
+      test_stat = .true.
+    end if
+    !
+    write(*,*) val
+  end subroutine test_vi_truncation_index
 end module test_driver_m

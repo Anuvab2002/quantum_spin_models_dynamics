@@ -18,6 +18,6 @@ contains
     complex(8)                                :: inner_pdt
     !
     inner_pdt = inner_product_dis(psi1, psi2)
-    val = conjg(inner_pdt)*inner_pdt
+    val = abs(conjg(inner_pdt)*inner_pdt)
   end function le
 end module dqc_probe_m

@@ -1,5 +1,5 @@
 !> @file simulate_helper.f90
-!> @provides additional routines for simulation
+!> @brief provides additional routines for simulation
 !> @author ap
 module simulate_helper_m
 contains

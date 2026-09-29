@@ -164,6 +164,16 @@ contains
     end if
     call test_banner_footer(testname)
     !---------------------------------------------
+    testname = "crank_nicolson_evolution"
+    call test_banner_header(testname)
+    call test_crank_nicolson_evolution(test_stat)
+    if (test_stat) then
+      write(*,*) "crank_nicolson_evolution passed."
+    else
+      write(*,*) "crank_nicolson_evolution failed."
+    end if
+    call test_banner_footer(testname)
+    !---------------------------------------------
     write(*,*) "==============================================================================="
   end subroutine testing_list
 end module test_controller_m

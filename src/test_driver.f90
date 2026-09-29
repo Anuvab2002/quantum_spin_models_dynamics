@@ -743,4 +743,75 @@ contains
     end if
     !
   end subroutine test_bch_c
+!> @brief subroutine for testing crank-nicolson evolution in qd_helper.f90
+  subroutine test_crank_nicolson_evolution(test_stat)
+    use global_m
+    use qd_helper_m
+    use ising_model_m
+    use matrix_generator_m
+    use linear_algebra_helper_m
+    implicit none
+    ! io variables
+    logical, intent(out)                            :: test_stat
+    ! internal variables
+    double precision                                :: n_real
+    integer                                         :: n
+    double precision, parameter                     :: j=1.d0
+    complex(8), parameter                           :: h=cmplx(0.d0,0.d0)
+    complex(8), dimension(2,2)                      :: sz
+    complex(8), dimension(2,2)                      :: sx
+    complex(8), allocatable, dimension(:,:)         :: ham
+    complex(8), allocatable, dimension(:,:)         :: eig_vect
+    double precision, allocatable, dimension(:)     :: eig_val
+    complex(8), allocatable, dimension(:)           :: psi0
+    complex(8), allocatable, dimension(:)           :: psit
+    complex(8)                                      :: norm0
+    complex(8)                                      :: normt
+    double precision                                :: dt
+    integer                                         :: dimm
+    logical                                         :: stat1
+    logical                                         :: stat2
+    complex(8), allocatable, dimension(:)           :: dif
+    !
+    call random_number(n_real)
+    n = floor(n_real*10.d0)+1
+    sz = pauli_matrices(3)
+    sx = pauli_matrices(1)
+    !
+    dimm = 2**n
+    ham = transverse_ising1d_hamiltonian(n, sz, sx, j, h, "o")
+    !
+    allocate(eig_vect(dimm,dimm))
+    allocate(eig_val(dimm))
+    allocate(psi0(dimm), psit(dimm))
+    allocate(dif(dimm))
+    !
+    call diagonalize_matrix(2**n, ham, eig_vect, eig_val)
+    psi0 = eig_vect(:,1)
+    !
+    call random_number(dt)
+    psit = crank_nicolson_evolution(psi0, ham, dt)
+    dif = psit-psi0
+    if (sum(abs(dif)).le.tol) then
+      stat1 = .false.
+    end if
+    !
+    stat2 = .false.
+    norm0=inner_product_dis(psi0,psi0)
+    normt=inner_product_dis(psit,psit)
+    if (abs(real(norm0)-real(normt)).le.tol) then
+      stat2 = .true.
+    end if
+    !
+    test_stat = .false.
+    if (.not.stat1 .and. stat2) then
+      test_stat = .true.
+    end if
+    !
+    write(*,*) norm0
+    write(*,*) normt
+    !
+    deallocate(ham, eig_vect, eig_val)
+    deallocate(psi0, psit)
+  end subroutine test_crank_nicolson_evolution
 end module test_driver_m

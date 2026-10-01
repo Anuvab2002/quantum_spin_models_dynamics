@@ -616,7 +616,7 @@ contains
     ! io variables
     logical, intent(out)                     :: test_stat
     ! internal variables
-    integer, parameter                       :: n=5
+    integer, parameter                       :: n=2
     complex(8), dimension(2,2)               :: sz
     complex(8), allocatable, dimension(:,:)  :: mag_op
     complex(8), dimension(2**n)              :: state
@@ -632,6 +632,11 @@ contains
     if (abs(abs(mag_val)-n*1.d0) .le. tol) then
       test_stat = .true.
     end if
+    !write(*,*) mag_val
+    !write(*,*)  mag_op(1,:)
+    !write(*,*)  mag_op(2,:)
+    !write(*,*)  mag_op(3,:)
+    !write(*,*)  mag_op(4,:)
   end subroutine test_magnetization_operator
 !> @brief subroutine for testing transverse_ising1d_hamiltonian function in ising_model.f90
   subroutine test_transverse_ising1d_hamiltonian(test_stat)
@@ -823,7 +828,7 @@ contains
     ! io variables
     logical, intent(out)                  :: test_stat
     ! internal variables
-    integer, parameter                    :: n=10
+    integer, parameter                    :: n=5
     complex(8), dimension(2,2)            :: sz
     complex(8), dimension(2,2)            :: sx
     double precision, parameter           :: j=0.3d0

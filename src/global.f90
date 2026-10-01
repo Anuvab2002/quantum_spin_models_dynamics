@@ -9,7 +9,7 @@ module global_m
   double precision, parameter           :: hbar=1.d0! hbar
 !--------------------------- Spin chain parameters ----------------------------!
   integer, parameter                    :: site=3! number of spin sites in the chain
-  character(len=1), parameter           :: bc="p"! boundary condition: o(open)/p(perodic)
+  character(len=1), parameter           :: bc="o"! boundary condition: o(open)/p(perodic)
   double precision, parameter           :: jz=1.d0! z-directional spin-spin coupling strength
   double precision, parameter           :: jx=1.d0! x-directional spin-spin coupling strength
   double precision, parameter           :: jy=1.d0! y-directional spin-spin coupling strength

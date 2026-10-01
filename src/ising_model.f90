@@ -224,4 +224,43 @@ contains
     ham = nn_coupling + zeeman_coupling
     deallocate(nn_coupling, zeeman_coupling)
   end function transverse_ising1d_hamiltonian
+!> @brief function for calculating one-site magnetization
+!> @param[in]     n         number of spin sites
+!> @param[in]     s         spin matrix
+!> @param[in]     index     index of the target spin site
+!> @return        s_m       site magnetization oerator matrix
+  function site_magnetization(n, s, index)result(s_m)
+    use linear_algebra_helper_m
+    use matrix_generator_m
+    implicit none
+    ! io variables
+    integer, intent(in)                           :: n
+    complex(8), dimension(:,:), intent(in)        :: s
+    integer, intent(in)                           :: index
+    complex(8), allocatable, dimension(:,:)       :: s_m
+    ! internal variables
+    integer                                       :: dim
+    integer                                       :: dimm
+    integer                                       :: p
+    integer                                       :: q
+    complex(8), allocatable, dimension(:,:)       :: i1
+    complex(8), allocatable, dimension(:,:)       :: i2
+    complex(8), allocatable, dimension(:,:)       :: temp1
+    !
+    dim = size(s,1)
+    dimm = 2**dim
+    !
+    allocate(s_m(dimm,dimm))
+    !
+    p = index-1
+    q = n-index
+    !
+    i1 = identity_matrix_complex(dim**p)
+    i2 = identity_matrix_complex(dim**q)
+    !
+    allocate(temp1(dim**(index),dim**(index)))
+    call kron_product(i1, s, temp1)
+    call kron_product(temp1, i2, s_m)
+    deallocate(i1, i2, temp1)
+  end function site_magnetization
 end module ising_model_m

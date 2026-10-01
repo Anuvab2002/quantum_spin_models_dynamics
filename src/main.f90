@@ -3,6 +3,7 @@
 !> @author ap
 program main_p
   use test_controller_m
+  use run_controller_m
   implicit none
   integer             :: num_args
   character(len=10)   :: arg
@@ -11,6 +12,8 @@ program main_p
     call get_command_argument(1,arg)
     if (trim(adjustl(arg))=="test") then
       call testing_list()
+    else if (trim(adjustl(arg))=="run") then
+      call simulate()
     else
       write(*,*) "Invalid argument! Execution stopped."
     end if

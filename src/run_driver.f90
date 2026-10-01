@@ -29,7 +29,9 @@ contains
     complex(8), dimension(dimm,dimm)    :: eig_vect
     double precision, dimension(dimm)   :: eig_val
     complex(8), dimension(dimm,dimm)    :: mag_s
+    complex(8), dimension(dimm,dimm)    :: mage_s
     complex(8), dimension(dimm,dimm)    :: mag_i
+    complex(8), dimension(dimm,dimm)    :: mage_i
     complex(8), dimension(dimm,dimm)    :: dmagdt_i
     !
     complex(8), dimension(dimm)         :: psi_old
@@ -43,6 +45,7 @@ contains
     double precision                    :: norm0
     double precision                    :: le1
     complex(8)                          :: mag_val
+    complex(8)                          :: mage_val
     complex(8)                          :: dmagdt_val
     !
     sx = (hbar*0.5d0)*pauli_matrices(1)
@@ -57,13 +60,15 @@ contains
     norm0 = abs(inner_product_dis(psi0, psi0))
     !
     mag_s = magnetization_operator(sz, site)
+    mage_s = site_magnetization(site, sz, 1)
     !
     open(unit=100, file="ht.dat", status="replace", action="write")
-    open(unit=101, file="norm_3spinp_1d.dat", status="replace", action="write")
-    open(unit=102, file="le1_3spinp_1d.dat", status="replace", action="write")
-    open(unit=104, file="mag_3spinp_1d.dat", status="replace", action="write")
-    open(unit=105, file="dmagdt_3spinp_1d.dat", status="replace", action="write")
-    open(unit=106, file="mag_dmagdt_3spinp_1d.dat", status="replace", action="write")
+    open(unit=101, file="norm_3spino_1d.dat", status="replace", action="write")
+    open(unit=102, file="le1_3spino_1d.dat", status="replace", action="write")
+    open(unit=104, file="mag_3spino_1d.dat", status="replace", action="write")
+    open(unit=105, file="dmagdt_3spino_1d.dat", status="replace", action="write")
+    open(unit=106, file="mag_dmagdt_3spino_1d.dat", status="replace", action="write")
+    open(unit=107, file="mage_3spino_1d.dat", status="replace", action="write")
     ntime = floor(tfinal/step)
     do idx = 1,ntime
       v_s = cmplx(0.d0,0.d0)
@@ -85,6 +90,9 @@ contains
       mag_i = operator_interaction(mag_s, ham0, t, n_bch)
       mag_val = expectation_value_dis(psi_new, mag_i)
       !
+      mage_i = operator_interaction(mage_s, ham0, t, n_bch)
+      mage_val = expectation_value_dis(psi_new, mage_i)
+      !
       dmagdt_i = heisenberg_eom(mag_i, ham0)
       dmagdt_val = expectation_value_dis(psi_new, dmagdt_i)
       !
@@ -95,6 +103,7 @@ contains
       write(104,*)  t, real(mag_val)
       write(105,*)  t, real(dmagdt_val)
       write(106,*)  real(mag_val), real(dmagdt_val)
+      write(107,*)  t, real(mage_val)
     end do
     !
     close(100)

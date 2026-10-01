@@ -164,10 +164,10 @@ contains
     end if
     !
     allocate(mag(dim**n,dim**n))
-    mag = cmplx(1.d0, 0.d0)
+    mag = cmplx(0.d0, 0.d0)
     !
     allocate(temp2(dim**n,dim**n))
-    do idx = 1,n-1
+    do idx = 1,n
       temp2 = cmplx(0.d0, 0.d0)
       !
       p = idx-1
@@ -179,10 +179,15 @@ contains
       allocate(temp1(dim**(idx),dim**(idx)))
       call kron_product(i1, s, temp1)
       call kron_product(temp1, i2, temp2)
+      !write(*,*) temp1
       !
       deallocate(i1, i2, temp1)
-      mag = mag + temp2
+      mag =  mag+temp2
     end do
+    !write(*,*) mag(1,:)
+    !write(*,*) mag(2,:)
+    !write(*,*) mag(3,:)
+    !write(*,*) mag(4,:)
     deallocate(temp2)
   end function magnetization_operator
 !> @brief function for constructing the Hamiltonian of 1-d transverse field ising model

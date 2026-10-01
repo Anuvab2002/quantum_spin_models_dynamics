@@ -59,5 +59,41 @@ contains
     end do
     deallocate(diff)
   end function vi_truncation_index
-
+!> @brief function for calculating time-dependent spin-field coupling strength
+!> @param[in]         h0          constant parameter
+!> @param[in]         w           frequency of oscillation
+!> @param[in]         t           time
+!> @param[in]         ramp_num    ctoff number of oscillations for the ramp function
+!> @return            ht          coupling strength at given time
+  function h_t(h0, w, t, ramp_num)result(ht)
+    implicit none
+    ! io variables
+    complex(8), intent(in)          :: h0
+    double precision, intent(in)    :: w
+    double precision, intent(in)    :: t
+    integer, intent(in)             :: ramp_num
+    complex(8)                      :: ht
+    ! internal variables
+    double precision                :: pi=4.d0*atan(1.d0)
+    !
+    ht = h0*cos(w*t)*ramp(t,(ramp_num*2.d0*pi/w))
+  end function h_t
+!> @brief function for constructing the ramp function
+!> @param[in]       t           time
+!> @param[in]       t0          cut-off time
+!> @return          rf          value of the ramp function
+  function ramp(t, t0)result(rf)
+    use global_m
+    implicit none
+    ! io variables
+    double precision, intent(in)      :: t
+    double precision, intent(in)      :: t0
+    double precision                  :: rf
+    !
+    if ((t-t0).le.tol) then
+      rf = t/t0
+    else
+      rf = 1.d0
+    end if
+  end function ramp
 end module simulate_helper_m

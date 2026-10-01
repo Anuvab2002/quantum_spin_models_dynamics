@@ -693,6 +693,50 @@ contains
       test_stat = .true.
     end if
   end subroutine test_transverse_ising1d_hamiltonian
+!> @brief subroutine for testing site_magnetization in ising_model.f90
+  subroutine test_site_magnetization(test_stat)
+    use global_m
+    use ising_model_m
+    use matrix_generator_m
+    use linear_algebra_helper_m
+    implicit none
+    ! io variables
+    logical, intent(out)    :: test_stat
+    ! internal variables
+    complex(8), dimension(2,2)                      :: sz
+    complex(8), allocatable, dimension(:,:)         :: mag_s2_1
+    complex(8), allocatable, dimension(:,:)         :: mag_s2_2
+    complex(8), dimension(2**2,2**2)                :: mag_s2_1_exp
+    complex(8), dimension(2**2,2**2)                :: mag_s2_2_exp
+    complex(8), dimension(2**2,2**2)                :: diff2_1
+    complex(8), dimension(2**2,2**2)                :: diff2_2
+    logical                                         :: stat21
+    logical                                         :: stat22
+    !
+    sz = pauli_matrices(3)
+    !
+    mag_s2_1 = site_magnetization(2, sz, 1)
+    mag_s2_2 = site_magnetization(2, sz, 2)
+    mag_s2_1_exp = reshape((/ cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                              cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                              cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0),&
+                              cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0) &
+                              /), shape(mag_s2_1_exp), order=(/2,1/))
+    mag_s2_2_exp = reshape((/ cmplx(1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                              cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), &
+                              cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(1.d0,0.d0), cmplx(0.d0,0.d0),&
+                              cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(0.d0,0.d0), cmplx(-1.d0,0.d0) &
+                              /), shape(mag_s2_1_exp), order=(/2,1/))
+    diff2_1 = mag_s2_1_exp - mag_s2_1
+    diff2_2 = mag_s2_2_exp - mag_s2_2
+    call if_null_c(diff2_1, stat21)
+    call if_null_c(diff2_2, stat22)
+    !
+    test_stat = .false.
+    if (stat21 .and. stat22) then
+      test_stat = .true.
+    end if
+  end subroutine test_site_magnetization
 !> @brief subroutine for testing bch_c subroutine in math_helper.f90
   subroutine test_bch_c(test_stat)
     use global_m

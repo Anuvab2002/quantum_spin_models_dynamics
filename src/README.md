@@ -6,7 +6,7 @@
   4.  test_driver.f90                   -> provides unit test routines
   5.  test_helper.f90                   -> provides assisting routines for unit testing
   6.  iohelper.f90                      -> assists inputs and outputs
-  7.  run_driver.f90                    -> controls final data generation
+  7.  run_driver.f90                    -> controls provides routines for final time evolution calculations
   8.  math_helper.f90                   -> provides necessary routines for mathematical operations
   9.  linear_algebra_helper.f90         -> provides necessary routines for linear algebra operations
   10. matrix_generator.f90              -> generates different kinds of matrices

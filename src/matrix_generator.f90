@@ -38,6 +38,9 @@ contains
     integer             :: i
     integer             :: j
 !
+    if (dim .eq. 0) then
+      identity_matrix = cmplx(1.d0, 0.d0)
+    end if
     identity_matrix = cmplx(0.0d0,0.0d0)
     do i = 1,dim
       identity_matrix(i,i) = cmplx(1.0d0, 0.0d0)
